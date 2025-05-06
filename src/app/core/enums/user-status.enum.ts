@@ -1,0 +1,7 @@
+export enum UserStatus {
+  CREATED = 'CREATED',
+  AUTHENTICATED = 'AUTHENTICATED',
+  UPDATED = 'UPDATED',
+  DELETED = 'DELETED',
+  FAILED = 'FAILED'
+}
