@@ -1,0 +1,26 @@
+<ng-container>
+  <section class="chat-search">
+    <input type="text" placeholder="Search..." />
+    <img src="/assets/UserIcon.svg" alt="User Icon" class="user-icon" (click)="onUserIconClick()" />
+  </section>
+  <section class="chat-list" *ngIf="!isInUserListMode">
+    <h1 class="chat-list-title">Chats</h1>
+    <div class="chat" *ngFor="let i of [1, 3, 2, 4, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]">
+      <div class="chat-title">
+        <span class="chat-user">User {{i}}</span>
+        <span class="chat-timestamp">2025-05-{{ (i >= 10) ? i : '0' + i }}</span>
+      </div>
+      <p class="chat-preview">Message {{i}}</p>
+    </div>
+  </section>
+  <section class="user-list" *ngIf="isInUserListMode">
+    <h1 class="user-list-title">Users</h1>
+    <div class="user" *ngFor="let i of [1, 3, 2, 4, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]">
+      <div class="user-title">
+        <span class="user-name">User {{i}}</span>
+        <span class="user-status">No chat</span>
+      </div>
+      <p class="user-id">ID: {{i}}</p>
+    </div>
+  </section>
+</ng-container>

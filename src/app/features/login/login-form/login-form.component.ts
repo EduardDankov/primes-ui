@@ -40,7 +40,7 @@ export class LoginFormComponent {
         const message: string = `Login successful. Token: ${response}`;
         console.log(message);
         alert(message);
-        this.router.navigate(['/profile']);
+        this.router.navigate(['/chat']);
       },
       error: (error: ErrorDto) => {
         const message: string = `Login failed. Error: ${error.error}. Do you want to register?`;
@@ -58,7 +58,7 @@ export class LoginFormComponent {
         const message: string = `Registration successful. Token: ${response}`;
         console.log(message);
         alert(message);
-        this.router.navigate(['/profile']);
+        this.router.navigate(['/chat']);
       },
       error: (error: ErrorDto) => {
         const message: string = `Registration failed. Error: ${error.error}`;

@@ -1,0 +1,16 @@
+import { Component } from '@angular/core';
+import {ChatListComponent} from './chat-list/chat-list.component';
+import {ChatWindowComponent} from './chat-window/chat-window.component';
+
+@Component({
+  selector: 'app-chats',
+  imports: [
+    ChatListComponent,
+    ChatWindowComponent
+  ],
+  templateUrl: './chats.component.html',
+  styleUrl: './chats.component.css'
+})
+export class ChatsComponent {
+
+}
