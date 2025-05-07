@@ -1,0 +1,46 @@
+header {
+  background-color: #f8f9fa;
+  padding: 1em;
+  border-bottom: .1em solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-logo a,
+.header-profile a {
+  font-size: 16px;
+  color: #6c6c6c;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.header-logo a:hover,
+.header-profile a:hover {
+  color: #151515;
+}
+
+.user-icon {
+  width: 3em;
+  height: 3em;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .user-icon {
+    width: 3em;
+    height: 3em;
+  }
+}
+
+@media (orientation: portrait) {
+  .user-icon {
+    width: 3em;
+    height: 3em;
+  }
+}
+
+.header-profile a:hover .user-icon {
+  filter: drop-shadow(0 0 .1em #616161);
+}
