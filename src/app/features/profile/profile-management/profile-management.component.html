@@ -1,0 +1,27 @@
+<ng-container>
+  <div class="profile-container">
+    <div class="user-info">
+      <h1>User Profile</h1>
+      <p><strong>ID:</strong> {{ this.getUser().id }}</p>
+      <p><strong>Username:</strong> {{ this.getUser().username }}</p>
+    </div>
+
+    <form [formGroup]="profileUpdateForm" (ngSubmit)="onSubmit()">
+      <div class="button-group">
+        <button type="button" class="profile-logout full-button" (click)="onLogOut()">Log out</button>
+      </div>
+      <div>
+        <label for="username">New Username</label>
+        <input type="text" id="username" name="username" formControlName="username" />
+      </div>
+      <div>
+        <label for="password">New Password</label>
+        <input type="password" id="password" name="password" formControlName="password" />
+      </div>
+      <div class="button-group">
+        <button type="submit" class="half-button">Update Profile</button>
+        <button type="button" class="profile-delete half-button" (click)="onDeleteProfile()">Delete Profile</button>
+      </div>
+    </form>
+  </div>
+</ng-container>

@@ -1,0 +1,89 @@
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+}
+
+.user-info {
+  margin: 1em 0;
+  width: fit-content;
+}
+
+.user-info h1 {
+  text-align: center;
+  margin-bottom: 0.5em;
+  font-size: 2em;
+  color: #333;
+}
+
+.user-info p {
+  text-align: left;
+  font-size: 1em;
+  line-height: 1.5em;
+  color: #333;
+  width: fit-content;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+form div {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+form div.button-group {
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+label {
+  align-self: flex-start;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+button {
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+
+button.half-button {
+  width: 48%;
+}
+
+button.full-button {
+  width: 100%;
+}
+
+button.profile-delete {
+  background-color: #f44336;
+  color: #e9ecef;
+  border: none;
+  border-radius: 5%;
+}
+
+button.profile-delete:hover {
+  background-color: #d32f2f;
+  border-radius: 5%;
+  text-shadow: 0 0 .5em #ff6a00;
+}
