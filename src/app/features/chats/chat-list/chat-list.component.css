@@ -1,3 +1,7 @@
+:host {
+  border-right: 1px solid #e9ecef;
+}
+
 .chat-list, .user-list {
   overflow-y: auto;
   box-sizing: border-box;
@@ -6,14 +10,18 @@
 .chat, .user {
   display: flex;
   flex-direction: column;
-  min-width: 40vw;
   border: 1px solid #e9ecef;
+  cursor: pointer;
+  width: 100%;
 }
 
-@media screen and (min-width: 1000px) {
-  .chat, .user {
-    min-width: 25vw;
-  }
+.info {
+  cursor: default;
+  border: none;
+}
+
+.chat:hover:not(.info), .user:hover:not(.info) {
+  background-color: #f8f9fa;
 }
 
 .chat.selected, .user.selected {
@@ -43,6 +51,7 @@ h1 {
   display: flex;
   justify-content: space-around;
   align-items: center;
+  padding: .5em;
 }
 
 input {
@@ -50,6 +59,12 @@ input {
   padding: .5em;
   font-size: 1em;
   box-sizing: border-box;
+}
+
+@media screen and (min-width: 1000px) {
+  input {
+    width: 90%;
+  }
 }
 
 .user-icon {

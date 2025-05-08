@@ -7,6 +7,10 @@ import {ProfileService} from '../../profile/services/profile.service';
 import {ErrorDto} from '../../../core/dto/error-dto';
 import {ChatResponseDto} from '../dto/chat-response-dto';
 import {UserStatusResponseDto} from '../../login/dto/user-status-response-dto';
+import {CreateChatRequestDto} from '../dto/create-chat-request-dto';
+import {ChatStatusResponseDto} from '../dto/chat-status-response-dto';
+import {MessageResponseDto} from '../dto/message-response-dto';
+import {ChatWindowComponent} from '../chat-window/chat-window.component';
 
 @Component({
   selector: 'app-chat-list',
@@ -23,6 +27,7 @@ export class ChatListComponent {
   private chatInterval = interval(60000)
   private chatSubscription: Subscription;
   private chats: Array<ChatResponseDto> = [];
+  private chatMessages: Map<string, Array<MessageResponseDto>> = new Map();
   chatsToRender: Array<ChatResponseDto> = []
 
   private userInterval = interval(60000)
@@ -67,7 +72,9 @@ export class ChatListComponent {
   }
 
   getChatUser(chat: ChatResponseDto): string {
-    return chat.createdBy === this.profileService.getUser().id ? chat.createdWith : chat.createdBy;
+    const userId: string = chat.createdBy === this.profileService.getUser().id ? chat.createdWith : chat.createdBy;
+    const username: string = this.users.find(user => user.id === userId)?.username || 'Unknown';
+    return `${username} (ID: ${userId})`;
   }
 
   getChatStatus(user: UserResponseDto): string {
@@ -76,9 +83,64 @@ export class ChatListComponent {
     }
     const chat: ChatResponseDto | undefined = this.chats.find(chat => chat.createdBy === user.id || chat.createdWith === user.id);
     if (chat) {
-      return 'Created';
+      return 'Chat created';
     }
     return 'No chat yet';
+  }
+
+  formatChatLatestMessage(chat: ChatResponseDto): string {
+    const message: MessageResponseDto | null = this.getChatLatestMessage(chat.id);
+    if (message === null) {
+      return 'No messages yet';
+    }
+    if (message.userId === this.user.id) {
+      return `You: ${message.message}`;
+    }
+    return message.message;
+  }
+
+  formatChatLatestMessageTime(chat: ChatResponseDto): string {
+    const message: MessageResponseDto | null = this.getChatLatestMessage(chat.id);
+    if (message === null) {
+      return '';
+    }
+    return this.formatMessageTimestamp(message.timestamp);
+  }
+
+  private formatMessageTimestamp(timestamp: Date): string {
+    return Intl.DateTimeFormat(undefined, {dateStyle: 'medium', timeStyle: 'medium'}).format(timestamp);
+  }
+
+  private getChatLatestMessage(chatId: string): MessageResponseDto | null {
+    const messages: Array<MessageResponseDto> | undefined = this.chatMessages.get(chatId);
+    if (messages === undefined || messages.length === 0) {
+      return null;
+    }
+    return messages[messages.length - 1];
+  }
+
+  createChatWith(user: UserResponseDto) {
+    if (this.doesChatExistWith(user)) {
+      const message: string = `Chat with ${user.username} already exists`;
+      console.log(message);
+      return;
+    }
+    const request: CreateChatRequestDto = new CreateChatRequestDto(this.user.id, user.id);
+    this.chatService.createChat(request).subscribe({
+      next: (response: ChatStatusResponseDto) => {
+        this.updateChats();
+        const message: string = `Chat with ${user.username} successfully created`;
+        console.log(message);
+      },
+      error: (error: ErrorDto) => {
+        const message: string = `Chat creation failed. Error: ${error.error}`;
+        console.log(message);
+      }
+    });
+  }
+
+  private doesChatExistWith(user: UserResponseDto): boolean {
+    return this.chats.find(chat => chat.createdWith == user.id || chat.createdBy == user.id) !== undefined;
   }
 
   private updateChats() {
@@ -87,6 +149,7 @@ export class ChatListComponent {
         this.chats = response;
         this.chatsToRender = this.chats;
         this.search();
+        this.updateMessages();
         const message: string = `Chats successfully updated`;
         console.log(message);
       },
@@ -94,6 +157,21 @@ export class ChatListComponent {
         const message: string = `Chat update failed, retrying in a minute. Error: ${error.error}`;
         console.log(message);
       }
+    });
+  }
+
+  private updateMessages() {
+    this.chatMessages.clear();
+    this.chats.forEach(chat => {
+      this.chatService.getMessagesForChat(chat.id).subscribe({
+        next: (response: Array<MessageResponseDto>) => {
+          this.chatMessages.set(chat.id, response);
+        },
+        error: (error: ErrorDto) => {
+          const message: string = `Message update failed. Error: ${error.error}`;
+          console.log(message);
+        }
+      });
     });
   }
 

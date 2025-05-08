@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {LoginService} from '../../login/services/login.service';
 import {UserStatusResponseDto} from '../../login/dto/user-status-response-dto';
-import {CreateUserDto} from '../../login/dto/create-user-dto';
+import {CreateUserRequestDto} from '../../login/dto/create-user-request-dto';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import * as API from '../../../core/constants/api.mapping';
 import {catchError, map, Observable} from 'rxjs';
@@ -50,7 +50,7 @@ export class ProfileService {
     );
   }
 
-  public updateUser(updatedUser: CreateUserDto): Observable<string> {
+  public updateUser(updatedUser: CreateUserRequestDto): Observable<string> {
     const user = this.loginService.getUser()!;
     updatedUser = this.validateUser(updatedUser, user);
     const headers = new HttpHeaders({
@@ -118,7 +118,7 @@ export class ProfileService {
     this.loginService.logOut();
   }
 
-  private validateUser(updatedUser: CreateUserDto, currentUser: UserStatusResponseDto): CreateUserDto {
+  private validateUser(updatedUser: CreateUserRequestDto, currentUser: UserStatusResponseDto): CreateUserRequestDto {
     const [username, password] = this.loginService.getToken()?.split(':')!;
     if (updatedUser.username === null || updatedUser.username.trim() === '') {
       updatedUser.username = username ?? currentUser.username;

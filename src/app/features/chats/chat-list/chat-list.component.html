@@ -8,28 +8,28 @@
     <div class="chat" *ngFor="let chat of chatsToRender">
       <div class="chat-title">
         <span class="chat-user">{{getChatUser(chat)}}</span>
-        <span class="chat-timestamp">Placeholder</span>
+        <span class="chat-timestamp">{{formatChatLatestMessageTime(chat)}}</span>
       </div>
-      <p class="chat-preview">Message placeholder</p>
+      <p class="chat-preview">{{formatChatLatestMessage(chat)}}</p>
     </div>
-    <div class="chat" *ngIf="chatsToRender.length === 0">
+    <div class="chat info" *ngIf="chatsToRender.length === 0">
       <div class="chat-title">
         <span class="chat-user">No chats created yet</span>
         <span class="chat-timestamp"></span>
       </div>
-      <p class="chat-preview">Use search to start communicating</p>
+      <p class="chat-preview">Use user search to start communicating</p>
     </div>
   </section>
   <section class="user-list" *ngIf="isInUserListMode">
     <h1 class="user-list-title">Users</h1>
-    <div class="user" *ngFor="let user of usersToRender">
+    <div class="user" *ngFor="let user of usersToRender" (click)="createChatWith(user)">
       <div class="user-title">
         <span class="user-name">{{user.username}}</span>
         <span class="user-status">{{getChatStatus(user)}}</span>
       </div>
       <p class="user-id">ID: {{user.id}}</p>
     </div>
-    <div class="user" *ngIf="usersToRender.length === 0">
+    <div class="user info" *ngIf="usersToRender.length === 0">
       <div class="user-title">
         <span class="user-name">No matching users found</span>
         <span class="user-status"></span>

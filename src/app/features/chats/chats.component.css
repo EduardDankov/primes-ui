@@ -1,5 +1,33 @@
 :host {
-  flex: 1;
+  flex: 1 2;
   display: flex;
   justify-content: space-between;
+}
+
+app-chat-list {
+  width: 40%;
+}
+
+app-chat-window {
+  width: 60%;
+}
+
+@media screen and (min-width: 1000px) {
+  app-chat-list {
+    width: 30%;
+  }
+
+  app-chat-window {
+    width: 70%;
+  }
+}
+
+@media screen and (min-width: 2000px) {
+  app-chat-list {
+    width: 20%;
+  }
+
+  app-chat-window {
+    width: 80%;
+  }
 }
