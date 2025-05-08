@@ -7,6 +7,7 @@ import * as API from '../../../core/constants/api.mapping';
 import {catchError, map, Observable} from 'rxjs';
 import {UserStatus} from '../../../core/enums/user-status.enum';
 import {ErrorDto} from '../../../core/dto/error-dto';
+import {UserResponseDto} from '../dto/user-response-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,32 @@ export class ProfileService {
       throw new Error('User not found');
     }
     return user;
+  }
+
+  public getUsers(): Observable<Array<UserResponseDto>> {
+    const headers = new HttpHeaders({
+      "Accept": "application/json",
+      "Authorization": `Bearer ${this.loginService.getToken()}`,
+      "Content-Type": "application/json",
+    })
+
+    return this.http.get(
+      API.getUrl(API.Mappings.USER_GET_ALL),
+      {headers: headers, observe: 'response'}
+    ).pipe(
+      map(response => {
+        console.dir(response);
+        if ([200].includes(response.status)) {
+          return (response.body as Array<any>).map((user: any) => UserResponseDto.fromJson(user));
+        } else {
+          throw response;
+        }
+      }),
+      catchError(error => {
+        const errorDto: ErrorDto = ErrorDto.fromJson(error.error);
+        throw new Error(errorDto.error);
+      })
+    );
   }
 
   public updateUser(updatedUser: CreateUserDto): Observable<string> {

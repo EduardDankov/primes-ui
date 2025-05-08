@@ -6,8 +6,14 @@
 .chat, .user {
   display: flex;
   flex-direction: column;
-  min-width: 25vw;
+  min-width: 40vw;
   border: 1px solid #e9ecef;
+}
+
+@media screen and (min-width: 1000px) {
+  .chat, .user {
+    min-width: 25vw;
+  }
 }
 
 .chat.selected, .user.selected {

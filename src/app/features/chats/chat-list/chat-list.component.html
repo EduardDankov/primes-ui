@@ -1,26 +1,40 @@
 <ng-container>
   <section class="chat-search">
-    <input type="text" placeholder="Search..." />
+    <input type="text" placeholder="Search..." (input)="search()" />
     <img src="/assets/UserIcon.svg" alt="User Icon" class="user-icon" (click)="onUserIconClick()" />
   </section>
   <section class="chat-list" *ngIf="!isInUserListMode">
     <h1 class="chat-list-title">Chats</h1>
-    <div class="chat" *ngFor="let i of [1, 3, 2, 4, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]">
+    <div class="chat" *ngFor="let chat of chatsToRender">
       <div class="chat-title">
-        <span class="chat-user">User {{i}}</span>
-        <span class="chat-timestamp">2025-05-{{ (i >= 10) ? i : '0' + i }}</span>
+        <span class="chat-user">{{getChatUser(chat)}}</span>
+        <span class="chat-timestamp">Placeholder</span>
       </div>
-      <p class="chat-preview">Message {{i}}</p>
+      <p class="chat-preview">Message placeholder</p>
+    </div>
+    <div class="chat" *ngIf="chatsToRender.length === 0">
+      <div class="chat-title">
+        <span class="chat-user">No chats created yet</span>
+        <span class="chat-timestamp"></span>
+      </div>
+      <p class="chat-preview">Use search to start communicating</p>
     </div>
   </section>
   <section class="user-list" *ngIf="isInUserListMode">
     <h1 class="user-list-title">Users</h1>
-    <div class="user" *ngFor="let i of [1, 3, 2, 4, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]">
+    <div class="user" *ngFor="let user of usersToRender">
       <div class="user-title">
-        <span class="user-name">User {{i}}</span>
-        <span class="user-status">No chat</span>
+        <span class="user-name">{{user.username}}</span>
+        <span class="user-status">{{getChatStatus(user)}}</span>
       </div>
-      <p class="user-id">ID: {{i}}</p>
+      <p class="user-id">ID: {{user.id}}</p>
+    </div>
+    <div class="user" *ngIf="usersToRender.length === 0">
+      <div class="user-title">
+        <span class="user-name">No matching users found</span>
+        <span class="user-status"></span>
+      </div>
+      <p class="user-id">Try to use a different query</p>
     </div>
   </section>
 </ng-container>
