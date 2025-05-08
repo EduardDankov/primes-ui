@@ -1,0 +1,84 @@
+:host {
+  border-right: 1px solid #e9ecef;
+}
+
+.chat-list, .user-list {
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.chat, .user {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e9ecef;
+  cursor: pointer;
+  width: 100%;
+}
+
+.info {
+  cursor: default;
+  border: none;
+}
+
+.chat:hover:not(.info), .user:hover:not(.info) {
+  background-color: #f8f9fa;
+}
+
+.chat.selected, .user.selected {
+  background-color: #f8f9fa;
+  border-radius: 5px 15px 15px 5px;
+  font-weight: bold;
+}
+
+.chat-title, .user-title {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1em;
+  margin: .25em .5em .5em .5em;
+}
+
+.chat-preview, .user-id {
+  font-size: 1em;
+  margin: .25em .5em .5em .5em;
+}
+
+h1 {
+  font-size: 1em;
+  margin: .5em;
+}
+
+.chat-search {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: .5em;
+}
+
+input {
+  width: 80%;
+  padding: .5em;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+@media screen and (min-width: 1000px) {
+  input {
+    width: 90%;
+  }
+}
+
+.user-icon {
+  width: 2em;
+  height: 2em;
+  display: block;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.user-icon.selected {
+  filter: drop-shadow(0 0 .2em #616161);
+}
+
+.user-icon:hover {
+  filter: drop-shadow(0 0 .1em #616161);
+}

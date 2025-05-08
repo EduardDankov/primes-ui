@@ -1,4 +1,4 @@
-export class CreateUserDto {
+export class CreateUserRequestDto {
   username: string;
   password: string;
 
@@ -7,7 +7,7 @@ export class CreateUserDto {
     this.password = password;
   }
 
-  static fromJson(json: any): CreateUserDto {
-    return new CreateUserDto(json.username, json.password);
+  static fromJson(json: any): CreateUserRequestDto {
+    return new CreateUserRequestDto(json.username, json.password);
   }
 }

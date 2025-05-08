@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import {UserStatusResponseDto} from '../../login/dto/user-status-response-dto';
 import {ProfileService} from '../services/profile.service';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {CreateUserDto} from '../../login/dto/create-user-dto';
+import {CreateUserRequestDto} from '../../login/dto/create-user-request-dto';
 import {ErrorDto} from '../../../core/dto/error-dto';
 
 @Component({
@@ -31,7 +31,7 @@ export class ProfileManagementComponent {
 
   public onSubmit() {
     if (this.profileUpdateForm.valid) {
-      const formData: CreateUserDto = <CreateUserDto> this.profileUpdateForm.value;
+      const formData: CreateUserRequestDto = <CreateUserRequestDto> this.profileUpdateForm.value;
 
       this.profileService.updateUser(formData).subscribe({
         next: (response: string) => {

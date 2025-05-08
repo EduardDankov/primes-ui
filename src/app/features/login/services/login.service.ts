@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
-import {CreateUserDto} from '../dto/create-user-dto';
+import {CreateUserRequestDto} from '../dto/create-user-request-dto';
 import {catchError, map, Observable} from 'rxjs';
 import {UserStatusResponseDto} from '../dto/user-status-response-dto';
 import {ErrorDto} from '../../../core/dto/error-dto';
@@ -30,7 +30,7 @@ export class LoginService {
     return JSON.parse(user) as UserStatusResponseDto;
   }
 
-  public updateToken(createUserDto: CreateUserDto) {
+  public updateToken(createUserDto: CreateUserRequestDto) {
     sessionStorage.setItem('token', createUserDto.username + ':' + createUserDto.password);
   }
 
@@ -38,7 +38,7 @@ export class LoginService {
     sessionStorage.setItem('user', JSON.stringify(userStatusResponseDto));
   }
 
-  public login(createUserDto: CreateUserDto): Observable<string> {
+  public login(createUserDto: CreateUserRequestDto): Observable<string> {
     if (this.isAuthenticated()) {
       alert(`Already logged in. Token: ${this.getToken()}`);
       return new Observable().pipe(map(() => this.getToken() as string));
@@ -62,7 +62,7 @@ export class LoginService {
     );
   }
 
-  public createUser(createUserDto: CreateUserDto): Observable<string> {
+  public createUser(createUserDto: CreateUserRequestDto): Observable<string> {
     if (this.isAuthenticated()) {
       alert(`Already logged in. Token: ${this.getToken()}`);
       return new Observable().pipe(map(() => this.getToken() as string));

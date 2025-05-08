@@ -1,6 +1,6 @@
 import {Component, forwardRef, Inject, inject} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {CreateUserDto} from '../dto/create-user-dto';
+import {CreateUserRequestDto} from '../dto/create-user-request-dto';
 import {LoginService} from '../services/login.service';
 import {UserStatusResponseDto} from '../dto/user-status-response-dto';
 import {ErrorDto} from '../../../core/dto/error-dto';
@@ -27,20 +27,20 @@ export class LoginFormComponent {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      const formData: CreateUserDto = <CreateUserDto> this.loginForm.value;
+      const formData: CreateUserRequestDto = <CreateUserRequestDto> this.loginForm.value;
       this.login(formData);
     } else {
       alert('Data is invalid');
     }
   }
 
-  private login(createUserDto: CreateUserDto): void {
+  private login(createUserDto: CreateUserRequestDto): void {
     this.loginService.login(createUserDto).subscribe({
       next: (response: string) => {
         const message: string = `Login successful. Token: ${response}`;
         console.log(message);
         alert(message);
-        this.router.navigate(['/profile']);
+        this.router.navigate(['/chat']);
       },
       error: (error: ErrorDto) => {
         const message: string = `Login failed. Error: ${error.error}. Do you want to register?`;
@@ -52,13 +52,13 @@ export class LoginFormComponent {
     });
   }
 
-  private register(createUserDto: CreateUserDto): void {
+  private register(createUserDto: CreateUserRequestDto): void {
     this.loginService.createUser(createUserDto).subscribe({
       next: (response: string) => {
         const message: string = `Registration successful. Token: ${response}`;
         console.log(message);
         alert(message);
-        this.router.navigate(['/profile']);
+        this.router.navigate(['/chat']);
       },
       error: (error: ErrorDto) => {
         const message: string = `Registration failed. Error: ${error.error}`;

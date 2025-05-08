@@ -17,7 +17,7 @@ export class LoginComponent {
   ngOnInit() {
     if (this.loginService.isAuthenticated()) {
       console.log('User is already logged in');
-      this.router.navigate(['/profile']);
+      this.router.navigate(['/chat']);
     }
   }
 }

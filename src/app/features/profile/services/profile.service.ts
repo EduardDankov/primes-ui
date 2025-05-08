@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import {LoginService} from '../../login/services/login.service';
 import {UserStatusResponseDto} from '../../login/dto/user-status-response-dto';
-import {CreateUserDto} from '../../login/dto/create-user-dto';
+import {CreateUserRequestDto} from '../../login/dto/create-user-request-dto';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import * as API from '../../../core/constants/api.mapping';
 import {catchError, map, Observable} from 'rxjs';
 import {UserStatus} from '../../../core/enums/user-status.enum';
 import {ErrorDto} from '../../../core/dto/error-dto';
+import {UserResponseDto} from '../dto/user-response-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,33 @@ export class ProfileService {
     return user;
   }
 
-  public updateUser(updatedUser: CreateUserDto): Observable<string> {
+  public getUsers(): Observable<Array<UserResponseDto>> {
+    const headers = new HttpHeaders({
+      "Accept": "application/json",
+      "Authorization": `Bearer ${this.loginService.getToken()}`,
+      "Content-Type": "application/json",
+    })
+
+    return this.http.get(
+      API.getUrl(API.Mappings.USER_GET_ALL),
+      {headers: headers, observe: 'response'}
+    ).pipe(
+      map(response => {
+        console.dir(response);
+        if ([200].includes(response.status)) {
+          return (response.body as Array<any>).map((user: any) => UserResponseDto.fromJson(user));
+        } else {
+          throw response;
+        }
+      }),
+      catchError(error => {
+        const errorDto: ErrorDto = ErrorDto.fromJson(error.error);
+        throw new Error(errorDto.error);
+      })
+    );
+  }
+
+  public updateUser(updatedUser: CreateUserRequestDto): Observable<string> {
     const user = this.loginService.getUser()!;
     updatedUser = this.validateUser(updatedUser, user);
     const headers = new HttpHeaders({
@@ -91,7 +118,7 @@ export class ProfileService {
     this.loginService.logOut();
   }
 
-  private validateUser(updatedUser: CreateUserDto, currentUser: UserStatusResponseDto): CreateUserDto {
+  private validateUser(updatedUser: CreateUserRequestDto, currentUser: UserStatusResponseDto): CreateUserRequestDto {
     const [username, password] = this.loginService.getToken()?.split(':')!;
     if (updatedUser.username === null || updatedUser.username.trim() === '') {
       updatedUser.username = username ?? currentUser.username;

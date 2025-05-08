@@ -1,0 +1,71 @@
+:host {
+  flex: 1 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.message-list {
+  overflow-y: auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  cursor: default;
+  padding: .5em;
+}
+
+.message-title {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1em;
+  margin: .25em;
+}
+
+.message-user {
+  font-weight: bold;
+}
+
+.message-text, .message-timestamp {
+  font-size: 1em;
+  margin: .25em;
+}
+
+.message-create {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: .5em;
+}
+
+input {
+  width: 80%;
+  padding: .5em;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+@media screen and (min-width: 1000px) {
+  input {
+    width: 95%;
+  }
+}
+
+.send-icon {
+  width: 2em;
+  height: 2em;
+  display: block;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.send-icon:hover {
+  filter: drop-shadow(0 0 .1em #616161);
+}
