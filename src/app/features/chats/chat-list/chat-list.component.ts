@@ -1,4 +1,4 @@
-import {Component, ElementRef} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {NgForOf, NgIf} from '@angular/common';
 import {ChatService} from '../services/chat.service';
 import {UserResponseDto} from '../../profile/dto/user-response-dto';
@@ -10,7 +10,6 @@ import {UserStatusResponseDto} from '../../login/dto/user-status-response-dto';
 import {CreateChatRequestDto} from '../dto/create-chat-request-dto';
 import {ChatStatusResponseDto} from '../dto/chat-status-response-dto';
 import {MessageResponseDto} from '../dto/message-response-dto';
-import {ChatWindowComponent} from '../chat-window/chat-window.component';
 
 @Component({
   selector: 'app-chat-list',
@@ -21,21 +20,24 @@ import {ChatWindowComponent} from '../chat-window/chat-window.component';
   templateUrl: './chat-list.component.html',
   styleUrl: './chat-list.component.css'
 })
-export class ChatListComponent {
+export class ChatListComponent implements OnInit {
   private user: UserStatusResponseDto;
 
-  private chatInterval = interval(60000)
+  private chatInterval = interval(5000)
   private chatSubscription: Subscription;
   private chats: Array<ChatResponseDto> = [];
   private chatMessages: Map<string, Array<MessageResponseDto>> = new Map();
   chatsToRender: Array<ChatResponseDto> = []
 
-  private userInterval = interval(60000)
+  private userInterval = interval(5000)
   private userSubscription: Subscription;
   private users: Array<UserResponseDto> = [];
-  usersToRender: Array<UserResponseDto> = []
+  usersToRender: Array<UserResponseDto> = [];
 
   isInUserListMode: boolean = false;
+  @Input() selectedChat: string | null = null;
+  @Output() selectChat = new EventEmitter<string>();
+  @Output() closeChat = new EventEmitter<void>();
 
   constructor(
     private readonly chatService: ChatService,
@@ -48,6 +50,9 @@ export class ChatListComponent {
     this.chatSubscription = this.chatInterval.subscribe(val => this.updateChats());
     this.updateUsers();
     this.userSubscription = this.userInterval.subscribe(val => this.updateUsers());
+  }
+
+  ngOnInit() {
   }
 
   search() {
@@ -73,8 +78,7 @@ export class ChatListComponent {
 
   getChatUser(chat: ChatResponseDto): string {
     const userId: string = chat.createdBy === this.profileService.getUser().id ? chat.createdWith : chat.createdBy;
-    const username: string = this.users.find(user => user.id === userId)?.username || 'Unknown';
-    return `${username} (ID: ${userId})`;
+    return this.users.find(user => user.id === userId)?.username || 'Unknown';
   }
 
   getChatStatus(user: UserResponseDto): string {
@@ -89,40 +93,50 @@ export class ChatListComponent {
   }
 
   formatChatLatestMessage(chat: ChatResponseDto): string {
-    const message: MessageResponseDto | null = this.getChatLatestMessage(chat.id);
-    if (message === null) {
+    const messages: Array<MessageResponseDto> | undefined = this.chatMessages.get(chat.id);
+    if (messages === undefined || messages.length === 0) {
       return 'No messages yet';
     }
-    if (message.userId === this.user.id) {
-      return `You: ${message.message}`;
+
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage.userId === this.user.id) {
+      return `You: ${lastMessage.message}`;
     }
-    return message.message;
+    return lastMessage.message;
   }
 
   formatChatLatestMessageTime(chat: ChatResponseDto): string {
-    const message: MessageResponseDto | null = this.getChatLatestMessage(chat.id);
-    if (message === null) {
+    const messages: Array<MessageResponseDto> | undefined = this.chatMessages.get(chat.id);
+    if (messages === undefined || messages.length === 0) {
       return '';
     }
-    return this.formatMessageTimestamp(message.timestamp);
+    const lastMessage = messages[messages.length - 1];
+    const date = new Date(lastMessage.createdAt);
+    return Intl.DateTimeFormat(undefined, {dateStyle: 'medium', timeStyle: 'medium'}).format(date);
   }
 
-  private formatMessageTimestamp(timestamp: Date): string {
-    return Intl.DateTimeFormat(undefined, {dateStyle: 'medium', timeStyle: 'medium'}).format(timestamp);
-  }
+  toggleChat(chat: ChatResponseDto) {
+    const newSelectedChat = this.elRef.nativeElement.querySelector(`.chat[data-id='${chat.id}']`);
+    const currentlySelectedChat = this.elRef.nativeElement.querySelector('.chat.selected');
 
-  private getChatLatestMessage(chatId: string): MessageResponseDto | null {
-    const messages: Array<MessageResponseDto> | undefined = this.chatMessages.get(chatId);
-    if (messages === undefined || messages.length === 0) {
-      return null;
+    if (currentlySelectedChat === newSelectedChat) {
+      newSelectedChat.classList.remove('selected');
+      this.closeChat.emit();
+      return;
     }
-    return messages[messages.length - 1];
+    if (currentlySelectedChat) {
+      currentlySelectedChat.classList.remove('selected');
+    }
+    newSelectedChat.classList.add('selected');
+    this.selectChat.emit(chat.id);
   }
 
   createChatWith(user: UserResponseDto) {
-    if (this.doesChatExistWith(user)) {
-      const message: string = `Chat with ${user.username} already exists`;
+    const chat: ChatResponseDto | undefined = this.getChatWith(user);
+    if (chat !== undefined) {
+      const message: string = `Chat with ${user.username} already exists, you can use chat search to find it`;
       console.log(message);
+      alert(message);
       return;
     }
     const request: CreateChatRequestDto = new CreateChatRequestDto(this.user.id, user.id);
@@ -139,8 +153,8 @@ export class ChatListComponent {
     });
   }
 
-  private doesChatExistWith(user: UserResponseDto): boolean {
-    return this.chats.find(chat => chat.createdWith == user.id || chat.createdBy == user.id) !== undefined;
+  private getChatWith(user: UserResponseDto): ChatResponseDto | undefined {
+    return this.chats.find(chat => chat.createdWith == user.id || chat.createdBy == user.id);
   }
 
   private updateChats() {
@@ -150,6 +164,7 @@ export class ChatListComponent {
         this.chatsToRender = this.chats;
         this.search();
         this.updateMessages();
+        setTimeout(() => this.updateSelectedChat(), 20);
         const message: string = `Chats successfully updated`;
         console.log(message);
       },
@@ -158,6 +173,18 @@ export class ChatListComponent {
         console.log(message);
       }
     });
+  }
+
+  private updateSelectedChat() {
+    if (this.selectedChat !== null) {
+      const selectedChat = this.elRef.nativeElement.querySelector(`.chat[data-id='${this.selectedChat}']`);
+      if (selectedChat !== null) {
+        selectedChat.classList.add('selected');
+      } else {
+        this.selectedChat = null;
+        this.closeChat.emit();
+      }
+    }
   }
 
   private updateMessages() {

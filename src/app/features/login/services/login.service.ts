@@ -46,7 +46,6 @@ export class LoginService {
 
     return this.http.post<HttpResponse<any>>(API.getUrl(API.Mappings.LOGIN), createUserDto, { observe: 'response' }).pipe(
       map(response => {
-        console.dir(response);
         if ([200].includes(response.status) && UserStatusResponseDto.fromJson(response.body).status === UserStatus.AUTHENTICATED) {
           this.updateToken(createUserDto);
           this.updateUser(UserStatusResponseDto.fromJson(response.body));
@@ -70,7 +69,6 @@ export class LoginService {
 
     return this.http.post<HttpResponse<any>>(API.getUrl(API.Mappings.USER_CREATE), createUserDto, { observe: 'response' }).pipe(
       map(response => {
-        console.dir(response);
         if ([201].includes(response.status) && UserStatusResponseDto.fromJson(response.body).status === UserStatus.CREATED) {
           this.updateToken(createUserDto);
           this.updateUser(UserStatusResponseDto.fromJson(response.body));

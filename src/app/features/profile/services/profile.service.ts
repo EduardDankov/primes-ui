@@ -24,6 +24,31 @@ export class ProfileService {
     return user;
   }
 
+  public getUserById(userId: string): Observable<UserResponseDto> {
+    const headers = new HttpHeaders({
+      "Accept": "application/json",
+      "Authorization": `Bearer ${this.loginService.getToken()}`,
+      "Content-Type": "application/json",
+    })
+
+    return this.http.get(
+      API.getUrl(API.Mappings.USER_GET, [userId]),
+      {headers: headers, observe: 'response'}
+    ).pipe(
+      map(response => {
+        if ([200].includes(response.status)) {
+          return UserResponseDto.fromJson(response.body);
+        } else {
+          throw response;
+        }
+      }),
+      catchError(error => {
+        const errorDto: ErrorDto = ErrorDto.fromJson(error.error);
+        throw new Error(errorDto.error);
+      })
+    );
+  }
+
   public getUsers(): Observable<Array<UserResponseDto>> {
     const headers = new HttpHeaders({
       "Accept": "application/json",
@@ -36,7 +61,6 @@ export class ProfileService {
       {headers: headers, observe: 'response'}
     ).pipe(
       map(response => {
-        console.dir(response);
         if ([200].includes(response.status)) {
           return (response.body as Array<any>).map((user: any) => UserResponseDto.fromJson(user));
         } else {
@@ -65,7 +89,6 @@ export class ProfileService {
       {headers: headers, observe: 'response'}
     ).pipe(
       map(response => {
-        console.dir(response);
         if ([200].includes(response.status) && UserStatusResponseDto.fromJson(response.body).status === UserStatus.UPDATED) {
           this.loginService.updateToken(updatedUser);
           this.loginService.updateUser(UserStatusResponseDto.fromJson(response.body));
@@ -99,7 +122,6 @@ export class ProfileService {
       {headers: headers, observe: 'response'}
     ).pipe(
       map(response => {
-        console.dir(response);
         if ([204].includes(response.status)) {
           this.loginService.logOut();
           return 'Profile deleted successfully';

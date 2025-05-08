@@ -1,7 +1,11 @@
-import { Component } from '@angular/core';
+import {Component, ElementRef, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {ChatService} from '../services/chat.service';
 import {MessageResponseDto} from '../dto/message-response-dto';
 import {NgForOf, NgIf} from '@angular/common';
+import {CreateMessageRequestDto} from "../dto/create-message-request-dto";
+import {ProfileService} from "../../profile/services/profile.service";
+import {UserResponseDto} from "../../profile/dto/user-response-dto";
+import {MessageStatusResponseDto} from "../dto/message-status-response-dto";
 
 @Component({
   selector: 'app-chat-window',
@@ -12,25 +16,76 @@ import {NgForOf, NgIf} from '@angular/common';
   templateUrl: './chat-window.component.html',
   styleUrl: './chat-window.component.css'
 })
-export class ChatWindowComponent {
-  messages: Array<MessageResponseDto> = [
-    new MessageResponseDto('1', '1', '1','Hello, how can I help you?', new Date()),
-    new MessageResponseDto('2', '1', '1','I am looking for a product.', new Date()),
-    new MessageResponseDto('3', '1', '1','Sure, what kind of product are you looking for?', new Date()),
-    new MessageResponseDto('4', '1', '1','I am looking for a laptop.', new Date()),
-    new MessageResponseDto('5', '1', '1','We have a great selection of laptops. What is your budget?', new Date()),
-    new MessageResponseDto('6', '1', '1','I am looking for a laptop under $1000.', new Date()),
-    new MessageResponseDto('7', '1', '1','We have a few options under $1000. Would you like to see them?', new Date()),
-    new MessageResponseDto('8', '1', '1','Yes, please.', new Date()),
-  ];
+export class ChatWindowComponent implements OnChanges {
+  private users: Array<UserResponseDto> = [];
+  messages: Array<MessageResponseDto> = [];
 
-  constructor(private readonly chatService: ChatService) { }
+  @Input() selectedChat: string | null = null;
 
-  formatMessageTimestamp(timestamp: Date): string {
+  constructor(private readonly chatService: ChatService, private readonly profileService: ProfileService, private elRef: ElementRef) { }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedChat']) {
+      this.updateUsers();
+      this.updateMessages(this.selectedChat);
+    }
+  }
+
+  formatUsername(message: MessageResponseDto): string {
+    const user: UserResponseDto | undefined = this.users.find(user => user.id === message.userId);
+    if (user === undefined) {
+      return 'Unknown';
+    }
+    return user.username;
+  }
+
+  formatMessageTimestamp(message: MessageResponseDto): string {
+    const timestamp: Date = new Date(message.createdAt);
     return Intl.DateTimeFormat(undefined, {dateStyle: 'medium', timeStyle: 'medium'}).format(timestamp);
   }
 
   sendMessage() {
-    alert('Patience, my friend! This feature is still under construction.');
+    const inputField = this.elRef.nativeElement.querySelector('.message-create>input');
+    const chatId: string = this.selectedChat!;
+    if (inputField.value.trim().length === 0) {
+      alert('Message cannot be empty');
+    }
+    const request: CreateMessageRequestDto = new CreateMessageRequestDto(chatId, inputField.value);
+
+    this.chatService.sendMessage(request).subscribe({
+      next: (response: MessageStatusResponseDto) => {
+        inputField.value = '';
+        this.updateMessages(chatId);
+      },
+      error: (error) => {
+        console.error('Error sending message:', error);
+      }
+    });
+  }
+
+  private updateUsers() {
+    this.profileService.getUsers().subscribe({
+      next: (users: Array<UserResponseDto>) => {
+        this.users = users;
+      },
+      error: (error) => {
+        console.error('Error fetching users:', error);
+      }
+    });
+  }
+
+  private updateMessages(chatId: string | null): void {
+    if (chatId === null) {
+      this.messages = [];
+      return;
+    }
+    this.chatService.getMessagesForChat(chatId).subscribe({
+      next: (messages: Array<MessageResponseDto>) => {
+        this.messages = messages;
+      },
+      error: (error) => {
+        console.error('Error fetching messages:', error);
+      }
+    });
   }
 }

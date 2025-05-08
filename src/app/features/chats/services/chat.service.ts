@@ -10,6 +10,8 @@ import {UserStatusResponseDto} from '../../login/dto/user-status-response-dto';
 import {CreateChatRequestDto} from '../dto/create-chat-request-dto';
 import {ChatStatusResponseDto} from '../dto/chat-status-response-dto';
 import {MessageResponseDto} from '../dto/message-response-dto';
+import {CreateMessageRequestDto} from "../dto/create-message-request-dto";
+import {MessageStatusResponseDto} from "../dto/message-status-response-dto";
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +33,6 @@ export class ChatService {
       {headers: headers, observe: 'response'}
     ).pipe(
       map(response => {
-        console.dir(response);
         if ([201].includes(response.status)) {
           return ChatStatusResponseDto.fromJson(response.body);
         } else {
@@ -58,7 +59,6 @@ export class ChatService {
       {headers: headers, observe: 'response'}
     ).pipe(
       map(response => {
-        console.dir(response);
         if ([200].includes(response.status)) {
           return (response.body as Array<any>).map((chat: any) => ChatResponseDto.fromJson(chat));
         } else {
@@ -84,9 +84,34 @@ export class ChatService {
       {headers: headers, observe: 'response'}
     ).pipe(
       map(response => {
-        console.dir(response);
         if ([200].includes(response.status)) {
           return (response.body as Array<any>).map((message: any) => MessageResponseDto.fromJson(message));
+        } else {
+          throw response;
+        }
+      }),
+      catchError(error => {
+        const errorDto: ErrorDto = ErrorDto.fromJson(error.error);
+        throw new Error(errorDto.error);
+      })
+    );
+  }
+
+  public sendMessage(message: CreateMessageRequestDto): Observable<MessageStatusResponseDto> {
+    const headers = new HttpHeaders({
+      "Accept": "application/json",
+      "Authorization": `Bearer ${this.loginService.getToken()}`,
+      "Content-Type": "application/json",
+    });
+
+    return this.http.post(
+      API.getUrl(API.Mappings.MESSAGE_CREATE),
+      message,
+      {headers: headers, observe: 'response'}
+    ).pipe(
+      map(response => {
+        if ([201].includes(response.status)) {
+          return MessageStatusResponseDto.fromJson(response.body);
         } else {
           throw response;
         }
