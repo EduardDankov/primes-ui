@@ -5,7 +5,7 @@
   </section>
   <section class="chat-list" *ngIf="!isInUserListMode">
     <h1 class="chat-list-title">Chats</h1>
-    <div class="chat" *ngFor="let chat of chatsToRender">
+    <div class="chat" *ngFor="let chat of chatsToRender" [attr.data-id]="chat.id" (click)="toggleChat(chat)">
       <div class="chat-title">
         <span class="chat-user">{{getChatUser(chat)}}</span>
         <span class="chat-timestamp">{{formatChatLatestMessageTime(chat)}}</span>

@@ -2,12 +2,12 @@
   <section class="message-list">
     <div class="message" *ngFor="let message of messages">
       <div class="message-title">
-        <span class="message-user">{{message.userId}}</span>
-        <span class="message-timestamp">{{formatMessageTimestamp(message.timestamp)}}</span>
+        <span class="message-user">{{formatUsername(message)}}</span>
+        <span class="message-timestamp">{{formatMessageTimestamp(message)}}</span>
       </div>
       <p class="message-text">{{message.message}}</p>
     </div>
-    <div class="message info" *ngIf="messages.length === 0">
+    <div class="message info" *ngIf="messages.length === 0 && selectedChat !== null">
       <div class="message-title">
         <span class="message-user">No messages yet</span>
         <span class="message-timestamp"></span>
@@ -15,7 +15,7 @@
       <p class="message-text">Use the chat box below to start chatting</p>
     </div>
   </section>
-  <section class="message-create">
+  <section class="message-create" *ngIf="selectedChat !== null">
     <input type="text" placeholder="Message..." />
     <img src="/assets/SendIcon.svg" alt="Send Icon" class="send-icon" (click)="sendMessage()" />
   </section>

@@ -12,5 +12,15 @@ import {ChatWindowComponent} from './chat-window/chat-window.component';
   styleUrl: './chats.component.css'
 })
 export class ChatsComponent {
+  selectedChat: string | null = null;
 
+  onSelectChat(chatId: string) {
+    console.log(`Selected chat ID: ${chatId}`);
+    this.selectedChat = chatId;
+  }
+
+  onCloseChat() {
+    console.log('Chat closed');
+    this.selectedChat = null;
+  }
 }

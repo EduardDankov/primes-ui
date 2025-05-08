@@ -1,4 +1,4 @@
 <ng-container>
-  <app-chat-list />
-  <app-chat-window />
+  <app-chat-list [selectedChat]="selectedChat" (selectChat)="onSelectChat($event)" (closeChat)="onCloseChat()" />
+  <app-chat-window [selectedChat]="selectedChat" />
 </ng-container>
