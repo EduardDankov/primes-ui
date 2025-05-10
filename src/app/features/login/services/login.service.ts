@@ -44,11 +44,16 @@ export class LoginService {
       return new Observable().pipe(map(() => this.getToken() as string));
     }
 
-    return this.http.post<HttpResponse<any>>(API.getUrl(API.Mappings.LOGIN), createUserDto, { observe: 'response' }).pipe(
+    return this.http.post<HttpResponse<any>>(
+      API.getUrl(API.Mappings.LOGIN),
+      createUserDto,
+      { observe: 'response' }
+    ).pipe(
       map(response => {
-        if ([200].includes(response.status) && UserStatusResponseDto.fromJson(response.body).status === UserStatus.AUTHENTICATED) {
+        const userStatusResponseDto: UserStatusResponseDto = UserStatusResponseDto.fromJson(response.body);
+        if ([200].includes(response.status) && userStatusResponseDto.status === UserStatus.AUTHENTICATED) {
           this.updateToken(createUserDto);
-          this.updateUser(UserStatusResponseDto.fromJson(response.body));
+          this.updateUser(userStatusResponseDto);
           return this.getToken() as string;
         } else {
           throw new ErrorDto('Wrong credentials');
